@@ -42,7 +42,16 @@
         button { padding: 10px 20px; background: #00ccff; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
         button:hover { background: #0099cc; }
         #result { margin: 20px; font-size: 20px; color: #00ff99; }
-        canvas { max-width: 600px; margin: 20px auto; }
+        canvas {
+            width: 80vw; /* 80% del ancho de la ventana */
+            height: 80vh; /* 80% del alto de la ventana */
+            min-width: 300px; /* No más chico que 300px en pantallas pequeñas */
+            min-height: 300px; /* Alto mínimo para legibilidad */
+            max-width: 1200px; /* Límite superior para pantallas enormes */
+            max-height: 800px; /* Límite superior para no exagerar */
+            margin: 20px auto; /* Centrado con espacio */
+            display: block; /* Evita problemas de inline */
+        }
         a:visited {
             color: #ff9900;
         }

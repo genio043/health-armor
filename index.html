@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-0463493221079646">
+    <title>Balanceador Salud/Armadura</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Arial', sans-serif; background: #1e1e1e; color: #ddd; text-align: center; margin: 20px; }
+        h1 { font-size: 28px; color: #00ccff; text-shadow: 0 0 10px #00ccff; }
+        .section { margin: 20px 0; padding: 15px; background: #2a2a2a; border-radius: 8px; }
+        .input-group { display: inline-block; margin: 10px; text-align: left; }
+        label { display: block; color: #bbb; }
+        input { padding: 8px; width: 80px; background: #333; color: #fff; border: 1px solid #444; border-radius: 4px; }
+        button { padding: 10px 20px; background: #00ccff; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0099cc; }
+        #result { margin: 20px; font-size: 20px; color: #00ff99; }
+        canvas { max-width: 600px; margin: 20px auto; }
+    </style>
+</head>
+<body>
+    <h1>Balanceador Salud/Armadura</h1>
+    <p>Calcula la resistencia efectiva de Salud y Armadura frente a daño sostenido.</p>
+    <div class="section">
+        <div class="input-group"><label>Salud (HP):</label><input type="number" id="health" min="1" value="100"></div>
+        <div class="input-group"><label>Armadura:</label><input type="number" id="armor" min="0" value="50"></div>
+        <div class="input-group"><label>Absorción Armadura (%):</label><input type="number" id="armorAbsorption" min="0" max="100" value="50"></div>
+        <div class="input-group"><label>Regen Salud (HP/s):</label><input type="number" id="healthRegen" min="0" value="5"></div>
+        <div class="input-group"><label>Regen Armadura (/s):</label><input type="number" id="armorRegen" min="0" value="2"></div>
+        <div class="input-group"><label>Reducción Daño (%):</label><input type="number" id="damageReduction" min="0" max="100" value="10"></div>
+        <div class="input-group"><label>Daño Entrante (DPS):</label><input type="number" id="incomingDPS" min="1" value="20"></div>
+    </div>
+    <button onclick="calculateBalance()">Calcular Resistencia</button>
+    <button onclick="resetData()">Resetear</button>
+    <button onclick="exportJSON()">Exportar JSON</button>
+    <div id="result"></div>
+    <canvas id="resistanceChart"></canvas>
+
+    <script>
+        let chart;
+        function calculateBalance() {
+            const health = parseFloat(document.getElementById('health').value);
+            const armor = parseFloat(document.getElementById('armor').value);
+            const armorAbsorption = parseFloat(document.getElementById('armorAbsorption').value) / 100;
+            const healthRegen = parseFloat(document.getElementById('healthRegen').value);
+            const armorRegen = parseFloat(document.getElementById('armorRegen').value);
+            const damageReduction = parseFloat(document.getElementById('damageReduction').value) / 100;
+            const incomingDPS = parseFloat(document.getElementById('incomingDPS').value);
+
+            if (health <= 0 || incomingDPS <= 0) {
+                document.getElementById('result').innerHTML = "¡Valores inválidos!";
+                return;
+            }
+
+            let effectiveHealth = health;
+            let currentArmor = armor;
+            const effectiveDPS = incomingDPS * (1 - damageReduction);
+            let timeToDie = 0;
+            let remainingHealth = health;
+            let remainingArmor = armor;
+            const dataPoints = [{ time: 0, health: health, armor: armor }];
+
+            while (timeToDie < 60 && remainingHealth > 0) {
+                timeToDie += 0.01;
+                const damageThisFrame = effectiveDPS * 0.01;
+                if (remainingArmor > 0) {
+                    const absorbed = Math.min(remainingArmor, damageThisFrame * armorAbsorption);
+                    remainingArmor -= absorbed;
+                    remainingHealth -= (damageThisFrame - absorbed);
+                } else {
+                    remainingHealth -= damageThisFrame;
+                }
+                remainingHealth = Math.min(health, remainingHealth + healthRegen * 0.01);
+                remainingArmor = Math.min(armor, remainingArmor + armorRegen * 0.01);
+                dataPoints.push({ time: timeToDie.toFixed(2), health: Math.max(0, remainingHealth), armor: Math.max(0, remainingArmor) });
+            }
+
+            effectiveHealth += armor / (1 - armorAbsorption); // Ajuste por absorción
+            const timeToDieResult = remainingHealth <= 0 ? timeToDie : "Más de 60s";
+            document.getElementById('result').innerHTML = `
+                Salud Efectiva: ${effectiveHealth.toFixed(2)}<br>
+                Tiempo para Morir: ${timeToDieResult} s
+            `;
+
+            drawChart(dataPoints);
+        }
+
+        function drawChart(dataPoints) {
+            const ctx = document.getElementById('resistanceChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dataPoints.map(d => d.time),
+                    datasets: [
+                        { label: 'Salud', data: dataPoints.map(d => d.health), borderColor: '#00ff99', fill: false },
+                        { label: 'Armadura', data: dataPoints.map(d => d.armor), borderColor: '#00ccff', fill: false }
+                    ]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'HP/Armadura', color: '#ddd' } },
+                        x: { title: { display: true, text: 'Tiempo (s)', color: '#ddd' } }
+                    },
+                    plugins: { legend: { labels: { color: '#ddd' } } }
+                }
+            });
+        }
+
+        function resetData() {
+            document.getElementById('health').value = 100;
+            document.getElementById('armor').value = 50;
+            document.getElementById('armorAbsorption').value = 50;
+            document.getElementById('healthRegen').value = 5;
+            document.getElementById('armorRegen').value = 2;
+            document.getElementById('damageReduction').value = 10;
+            document.getElementById('incomingDPS').value = 20;
+            document.getElementById('result').innerHTML = '';
+            if (chart) chart.destroy();
+        }
+
+        function exportJSON() {
+            const data = {
+                health: document.getElementById('health').value,
+                armor: document.getElementById('armor').value,
+                armorAbsorption: document.getElementById('armorAbsorption').value,
+                healthRegen: document.getElementById('healthRegen').value,
+                armorRegen: document.getElementById('armorRegen').value,
+                damageReduction: document.getElementById('damageReduction').value,
+                incomingDPS: document.getElementById('incomingDPS').value
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'health_armor_config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

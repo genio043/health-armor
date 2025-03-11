@@ -82,6 +82,7 @@
             border-radius: 4px;
             box-shadow: 0 0 10px #00ff99;
         }
+        .donate a { color: #00ccff; font-weight: bold; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -101,7 +102,9 @@
     <button onclick="exportJSON()">Exportar JSON</button>
     <div id="result"></div>
     <canvas id="resistanceChart"></canvas>
-
+    <div class="donate">
+        <p>¿Te sirvió? <a href="https://buymeacoffee.com/genio043" target="_blank">Cómprame un té :)</a></p>
+    </div>
     <script>
         let chart;
         function calculateBalance() {

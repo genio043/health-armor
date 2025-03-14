@@ -89,13 +89,13 @@
     <h1>Health/Armor Balancer</h1>
     <p>Calculate the effective resistance of Health and Armor against sustained damage.</p>
     <div class="section">
-        <div class="input-group"><label>Health (HP):</label><input type="number" id="health" min="1" value="100"></div>
-        <div class="input-group"><label>Armor:</label><input type="number" id="armor" min="0" value="50"></div>
-        <div class="input-group"><label>Armor Absorption (%):</label><input type="number" id="armorAbsorption" min="0" max="100" value="50"></div>
-        <div class="input-group"><label>Health Regen (HP/s):</label><input type="number" id="healthRegen" min="0" value="5"></div>
-        <div class="input-group"><label>Armor Regen (/s):</label><input type="number" id="armorRegen" min="0" value="2"></div>
-        <div class="input-group"><label>Damage Reduction (%):</label><input type="number" id="damageReduction" min="0" max="100" value="10"></div>
-        <div class="input-group"><label>Incoming DPS (DPS):</label><input type="number" id="incomingDPS" min="1" value="20"></div>
+        <div class="input-group"><label>Health (HP):</label><input type="number" id="health" min="1" value="100"></div><br/>
+        <div class="input-group"><label>Armor:</label><input type="number" id="armor" min="0" value="50"></div><br/>
+        <div class="input-group"><label>Armor Absorption (%):</label><input type="number" id="armorAbsorption" min="0" max="100" value="50"></div><br/>
+        <div class="input-group"><label>Health Regen (HP/s):</label><input type="number" id="healthRegen" min="0" value="5"></div><br/>
+        <div class="input-group"><label>Armor Regen (/s):</label><input type="number" id="armorRegen" min="0" value="2"></div><br/>
+        <div class="input-group"><label>Damage Reduction (%):</label><input type="number" id="damageReduction" min="0" max="100" value="10"></div><br/>
+        <div class="input-group"><label>Incoming DPS (DPS):</label><input type="number" id="incomingDPS" min="1" value="20"></div><br/>
     </div>
     <button onclick="calculateBalance()">Calculate Resistance</button>
     <button onclick="resetData()">Reset</button>

@@ -89,25 +89,33 @@
     <h1>Balanceador Salud/Armadura</h1>
     <p>Calcula la resistencia efectiva de Salud y Armadura frente a daño sostenido.</p>
     <div class="section">
-        <div class="input-group"><label>Salud (HP):</label><input type="number" id="health" min="1" value="100"></div>
-        <div class="input-group"><label>Armadura:</label><input type="number" id="armor" min="0" value="50"></div>
-        <div class="input-group"><label>Absorción Armadura (%):</label><input type="number" id="armorAbsorption" min="0" max="100" value="50"></div>
-        <div class="input-group"><label>Regen Salud (HP/s):</label><input type="number" id="healthRegen" min="0" value="5"></div>
-        <div class="input-group"><label>Regen Armadura (/s):</label><input type="number" id="armorRegen" min="0" value="2"></div>
-        <div class="input-group"><label>Reducción Daño (%):</label><input type="number" id="damageReduction" min="0" max="100" value="10"></div>
-        <div class="input-group"><label>Daño Entrante (DPS):</label><input type="number" id="incomingDPS" min="1" value="20"></div>
+        <div class="input-group"><label>Health (HP):</label><input type="number" id="health" min="1" value="100"></div>
+        <div class="input-group"><label>Armor:</label><input type="number" id="armor" min="0" value="50"></div>
+        <div class="input-group"><label>Armor Absorption (%):</label><input type="number" id="armorAbsorption" min="0" max="100" value="50"></div>
+        <div class="input-group"><label>Health Regen (HP/s):</label><input type="number" id="healthRegen" min="0" value="5"></div>
+        <div class="input-group"><label>Armor Regen (/s):</label><input type="number" id="armorRegen" min="0" value="2"></div>
+        <div class="input-group"><label>Damage Reduction (%):</label><input type="number" id="damageReduction" min="0" max="100" value="10"></div>
+        <div class="input-group"><label>Incoming DPS (DPS):</label><input type="number" id="incomingDPS" min="1" value="20"></div>
     </div>
-    <button onclick="calculateBalance()">Calcular Resistencia</button>
-    <button onclick="resetData()">Resetear</button>
-    <button onclick="exportJSON()">Exportar JSON</button>
+    <button onclick="calculateBalance()">Calculate Resistance</button>
+    <button onclick="resetData()">Reset</button>
+    <button onclick="exportJSON()">Export JSON</button>
     <div id="result"></div>
     <canvas id="resistanceChart"></canvas>
     <div class="donate">
-        <p>¿Te sirvió? <a href="https://buymeacoffee.com/genio043" target="_blank">Cómprame un té :)</a></p>
+        <p>Did you find this useful?  <a href="https://buymeacoffee.com/genio043" target="_blank">Buy me a tea :)</a></p>
     </div>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0463493221079646" crossorigin="anonymous"></script>
     <script>
         let chart;
+        document.getElementById("health").oninput = function() {calculateBalance()};
+        document.getElementById("armor").oninput = function() {calculateBalance()};
+        document.getElementById("armorAbsorption").oninput = function() {calculateBalance()};
+        document.getElementById("healthRegen").oninput = function() {calculateBalance()};
+        document.getElementById("armorRegen").oninput = function() {calculateBalance()};
+        document.getElementById("damageReduction").oninput = function() {calculateBalance()};
+        document.getElementById("incomingDPS").oninput = function() {calculateBalance()};
+        
         function calculateBalance() {
             const health = parseFloat(document.getElementById('health').value);
             const armor = parseFloat(document.getElementById('armor').value);
@@ -118,7 +126,7 @@
             const incomingDPS = parseFloat(document.getElementById('incomingDPS').value);
 
             if (health <= 0 || incomingDPS <= 0) {
-                document.getElementById('result').innerHTML = "¡Valores inválidos!";
+                document.getElementById('result').innerHTML = "Invalid values!";
                 return;
             }
 
@@ -163,14 +171,14 @@
                 data: {
                     labels: dataPoints.map(d => d.time),
                     datasets: [
-                        { label: 'Salud', data: dataPoints.map(d => d.health), borderColor: '#00ff99', fill: false },
-                        { label: 'Armadura', data: dataPoints.map(d => d.armor), borderColor: '#00ccff', fill: false }
+                        { label: 'Health', data: dataPoints.map(d => d.health), borderColor: '#00ff99', fill: false },
+                        { label: 'Armor', data: dataPoints.map(d => d.armor), borderColor: '#00ccff', fill: false }
                     ]
                 },
                 options: {
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'HP/Armadura', color: '#ddd' } },
-                        x: { title: { display: true, text: 'Tiempo (s)', color: '#ddd' } }
+                        y: { beginAtZero: true, title: { display: true, text: 'HP/Armor', color: '#ddd' } },
+                        x: { title: { display: true, text: 'Time (s)', color: '#ddd' } }
                     },
                     plugins: { legend: { labels: { color: '#ddd' } } }
                 }
@@ -208,6 +216,6 @@
             URL.revokeObjectURL(url);
         }
     </script>
-    <footer><p>Volver a <a href="https://genio043.github.io/">Genio043 Tools</a></p></footer>
+    <footer><p>Back to <a href="https://genio043.github.io/">Genio043's Tools</a></p></footer>
 </body>
 </html>
